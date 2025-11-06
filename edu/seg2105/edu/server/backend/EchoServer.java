@@ -73,6 +73,18 @@ public class EchoServer extends AbstractServer
   }
   
   
+  @Override
+  protected void clientConnected(ConnectionToClient client) {
+    System.out.println("New client connected to the server.");
+  }
+
+  @Override
+  synchronized protected void clientDisconnected(ConnectionToClient client) {
+    System.out.println("Client disconnected from the server.");
+  }
+
+  
+  
   //Class methods ***************************************************
   
   /**
