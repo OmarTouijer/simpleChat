@@ -86,15 +86,88 @@ public class ClientConsole implements ChatIF
       while (true) 
       {
         message = fromConsole.nextLine();
-        client.handleMessageFromClientUI(message);
-      }
-    } 
+        
+        if (message.startsWith("#")){
+            handleCommand(message);
+        }else{
+        	client.handleMessageFromClientUI(message);
+        }
+      } 
+    }
     catch (Exception ex) 
     {
       System.out.println
         ("Unexpected error while reading from console!");
     }
   }
+  
+  
+  private void handleCommand(String message) {
+	  try {
+	    if (message.equalsIgnoreCase("#quit")) {
+	      display("Closing client.");
+	      client.quit();
+	    } 
+	    else if (message.equalsIgnoreCase("#logoff")) {
+	      if (client.isConnected()) {
+	        client.closeConnection();
+	        display("Disconnected from server.");
+	      }else{
+	        display("Is already logged off.");
+	      }
+	    } 
+	    else if (message.startsWith("#sethost")) {
+	      if (!client.isConnected()) {
+	        String[] parts = message.split(" ");
+	        if (parts.length > 1) {
+	          client.setHost(parts[1]);
+	          display("Host set to " + parts[1]);
+	        } else {
+	          display("Usage: #sethost <host>");
+	        }
+	      } else{
+	        display("Must log off before changing host.");
+	      }
+	    } 
+	    else if (message.startsWith("#setport")) {
+	      if (!client.isConnected()) {
+	        String[] parts = message.split(" ");
+	        if (parts.length > 1) {
+	          try {
+	            int newPort = Integer.parseInt(parts[1]);
+	            client.setPort(newPort);
+	            display("Port set to " + newPort);
+	          } catch (NumberFormatException e) {
+	            display("Invalid port number.");
+	          }
+	        }else{
+	          display("Usage: #setport <port>");
+	        }
+	      }else{
+	        display("Must log off before changing port.");
+	      }
+	    } 
+	    else if (message.equalsIgnoreCase("#login")) {
+	      if (!client.isConnected()) {
+	        client.openConnection();
+	        display("Reconnected to server.");
+	      }else {
+	        display("Already connected.");
+	      }
+	    } 
+	    else if (message.equalsIgnoreCase("#gethost")) {
+	      display("Current host: " + client.getHost());
+	    } 
+	    else if (message.equalsIgnoreCase("#getport")) {
+	      display("Current port: " + client.getPort());
+	    }else {
+	      display("Unknown command: " + message);
+	    }
+	  }catch (IOException e) {
+	    display("Error processing command: " + e.getMessage());
+	  }
+	}
+
 
   /**
    * This method overrides the method in the ChatIF interface.  It
